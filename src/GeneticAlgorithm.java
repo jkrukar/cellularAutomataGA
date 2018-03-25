@@ -35,17 +35,8 @@ public class GeneticAlgorithm {
 
                 //Keep track of which indexes have been flipped so that we don't try to flip the same one again
                 boolean nextVariant[] = {false, false, false, false, false, false, false, false};
-                int flipsLeft = nextLambda;
 
-                while(flipsLeft > 0){
-                    int nextFlipIndex = random.nextInt(8);
-
-                    //If this index is false, flip it to true
-                    if(!nextVariant[nextFlipIndex]){
-                        nextVariant[nextFlipIndex] = true;
-                        flipsLeft --;
-                    }
-                }
+                mutateGenotype(nextLambda, nextVariant);
 
                 //Add variant to the population
                 RuleSet nextRuleSet = new RuleSet(lambdaVal, nextVariant);
@@ -81,13 +72,69 @@ public class GeneticAlgorithm {
 
     }
 
-    public void mutateGenotype(){
+    //Genotypes will be mutated 2 times as indicated in the paper
+    //Also used to generate the initial population of rule sets
+    public void mutateGenotype(boolean[] originalRule){
+        generateMutations(2, originalRule);
+    }
 
+    //Mutate a specified number of times
+    public void mutateGenotype(int mutations, boolean[] originalRule){
+        generateMutations(mutations, originalRule);
+    }
+
+    private void generateMutations(int mutations, boolean[] originalRule){
+        //Keep track of which indexes have been flipped so that we don't try to flip the same one again
+        boolean mutatedIndices[] = {false, false, false, false, false, false, false, false};
+        int mutationsLeft = mutations;
+
+        if(debug){
+            System.out.println("mutateGenotype()...");
+            System.out.print("\tPre -mutation: [");
+
+            for(int j=0; j<8;j++){
+                if(originalRule[j]){
+                    System.out.print("1,");
+                }else{
+                    System.out.print("0,");
+                }
+            }
+
+            System.out.print("]\n");
+        }
+
+        while(mutationsLeft > 0){
+            int nextMutationIndex = random.nextInt(8);
+
+            //If this index is false, flip it to true
+            if(!mutatedIndices[nextMutationIndex]){
+                mutatedIndices[nextMutationIndex] = true;
+                originalRule[nextMutationIndex] = !originalRule[nextMutationIndex];
+                mutationsLeft --;
+            }
+        }
+
+        if(debug){
+            System.out.print("\tPost-mutation: [");
+
+            for(int j=0; j<8;j++){
+                if(originalRule[j]){
+                    System.out.print("1,");
+                }else{
+                    System.out.print("0,");
+                }
+            }
+
+            System.out.print("]\n");
+        }
     }
 
     public static void main(String[] args){
         GeneticAlgorithm GA = new GeneticAlgorithm();
         GA.generateInitialRuleSetPopulation();
+
+        boolean test[] = {false, true, false, true, false, true, false, true};
+        GA.mutateGenotype(test);
     }
 }
 
