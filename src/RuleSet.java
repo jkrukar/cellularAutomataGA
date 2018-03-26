@@ -16,7 +16,7 @@ public class RuleSet {
         this.rule = rule;
         this.results = new boolean[100];
 
-        int trueCount = 0;
+        double trueCount = 0;
 
         for(int i=0; i<8; i++){
             if(rule[i]){
@@ -29,7 +29,7 @@ public class RuleSet {
 
     public void calculateFitness(){
 
-        double fitness = 0;
+        fitness = 0;
 
         for(int i=0; i<100;i++){
             if(results[i]){
@@ -38,7 +38,5 @@ public class RuleSet {
         }
 
         fitness /= 100;
-
-        this.fitness = fitness;
     }
 }
