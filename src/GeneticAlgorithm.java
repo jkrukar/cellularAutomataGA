@@ -1,11 +1,11 @@
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 public class GeneticAlgorithm {
 
     Random random = new Random();
     ArrayList<RuleSet> currentRuleSetPopultion = new ArrayList<>(100);
+    ArrayList<RuleSet> nextRuleSetGeneration;
     boolean debug = true;
 
 
@@ -124,7 +124,7 @@ public class GeneticAlgorithm {
         }
     }
 
-    public void generateRecombinant(boolean[] rule1, boolean[] rule2){
+    public boolean[][] generateRecombinants(boolean[] rule1, boolean[] rule2){
 
         int crossOverIndex = random.nextInt(6) +1;
 
@@ -188,18 +188,85 @@ public class GeneticAlgorithm {
             }
 
             System.out.print("]\n");
-
         }
+
+        boolean recombinants[][] = {newRule1,newRule2};
+
+        return recombinants;
+    }
+
+    public PriorityQueue<RuleSet> sortRuleFitness(ArrayList<RuleSet> population){
+
+        PriorityQueue<RuleSet> priorityRuleSet = new PriorityQueue<>(new FitnessComparator());
+        int populationSize = population.size();
+
+        //Calculate fitness for every member of population and add it to priority queue
+        for(int i=0; i< populationSize;i++){
+            RuleSet nextRuleSet = population.get(i);
+            System.out.println("adding ruleSet with fitness = " + nextRuleSet.fitness);
+            nextRuleSet.calculateFitness();
+            priorityRuleSet.add(nextRuleSet);
+        }
+
+        return priorityRuleSet;
+    }
+
+    public ArrayList<RuleSet> getNextGeneration(){
+
+        ArrayList<RuleSet> nextRuleSetGeneration = new ArrayList<>(100);
+        PriorityQueue<RuleSet> eliteRules = sortRuleFitness(currentRuleSetPopultion);
+        int eliteCount = 0;
+
+        while(eliteCount < 20){
+
+            RuleSet nextElite = eliteRules.poll();
+            nextRuleSetGeneration.add(nextElite);
+            eliteCount ++;
+        }
+
+        System.out.println("EliteCount = " + eliteCount);
+
+        //Generate 80 recombinants for remaining population
+        for(int i=0; i< 40; i++){
+            RuleSet randomParent1 = nextRuleSetGeneration.get(random.nextInt(20));
+            RuleSet randomParent2 = nextRuleSetGeneration.get(random.nextInt(20));
+
+            boolean[][] recombinantRules = generateRecombinants(randomParent1.rule, randomParent2.rule);
+
+            mutateGenotype(recombinantRules[0]);
+            mutateGenotype(recombinantRules[1]);
+
+            RuleSet recombinant1 = new RuleSet(recombinantRules[0]);
+            RuleSet recombinant2 = new RuleSet(recombinantRules[1]);
+
+            nextRuleSetGeneration.add(recombinant1);
+            nextRuleSetGeneration.add(recombinant2);
+        }
+
+        return nextRuleSetGeneration;
     }
 
     public static void main(String[] args){
         GeneticAlgorithm GA = new GeneticAlgorithm();
         GA.generateInitialRuleSetPopulation();
 
-//        boolean test[] = {false, true, false, true, false, true, false, true};
-//        GA.mutateGenotype(test);
+//        ArrayList<RuleSet> test = GA.getNextGeneration();
+//        System.out.println("testSize = " + test.size());
 
-        GA.generateRecombinant(GA.currentRuleSetPopultion.get(0).rule, GA.currentRuleSetPopultion.get(1).rule);
+    }
+
+    private class FitnessComparator implements Comparator<RuleSet>{
+
+        public int compare(RuleSet a, RuleSet b){
+
+            if(a.fitness == b.fitness){
+                return 0;
+            }else if(a.fitness > b.fitness){
+                return -1;
+            }else{
+                return 1;
+            }
+        }
     }
 }
 
