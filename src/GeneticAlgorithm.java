@@ -1,4 +1,3 @@
-import javafx.css.Rule;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -68,10 +67,6 @@ public class GeneticAlgorithm {
         }
     }
 
-    public void generateRecombinant(){
-
-    }
-
     //Genotypes will be mutated 2 times as indicated in the paper
     //Also used to generate the initial population of rule sets
     public void mutateGenotype(boolean[] originalRule){
@@ -129,12 +124,82 @@ public class GeneticAlgorithm {
         }
     }
 
+    public void generateRecombinant(boolean[] rule1, boolean[] rule2){
+
+        int crossOverIndex = random.nextInt(6) +1;
+
+        boolean newRule1[] = new boolean[8];
+        boolean newRule2[] = new boolean[8];
+
+        for(int j=0; j<8;j++){
+            if(j<crossOverIndex){
+                newRule1[j] = rule2[j];
+                newRule2[j] = rule1[j];
+            }else{
+                newRule1[j] = rule1[j];
+                newRule2[j] = rule2[j];
+            }
+        }
+
+        if(debug){
+            System.out.println("generateRecombinant()...");
+            System.out.println("\tcrossOverIndex= " + crossOverIndex);
+
+            System.out.print("Rule1 pre: [");
+
+            for(int j=0; j<8;j++){
+                if(rule1[j]){
+                    System.out.print("1,");
+                }else{
+                    System.out.print("0,");
+                }
+            }
+
+            System.out.print("] post: [");
+
+            for(int j=0; j<8;j++){
+                if(newRule1[j]){
+                    System.out.print("1,");
+                }else{
+                    System.out.print("0,");
+                }
+            }
+
+            System.out.print("]\n");
+
+            System.out.print("Rule2 pre: [");
+
+            for(int j=0; j<8;j++){
+                if(rule2[j]){
+                    System.out.print("1,");
+                }else{
+                    System.out.print("0,");
+                }
+            }
+
+            System.out.print("] post: [");
+
+            for(int j=0; j<8;j++){
+                if(newRule2[j]){
+                    System.out.print("1,");
+                }else{
+                    System.out.print("0,");
+                }
+            }
+
+            System.out.print("]\n");
+
+        }
+    }
+
     public static void main(String[] args){
         GeneticAlgorithm GA = new GeneticAlgorithm();
         GA.generateInitialRuleSetPopulation();
 
-        boolean test[] = {false, true, false, true, false, true, false, true};
-        GA.mutateGenotype(test);
+//        boolean test[] = {false, true, false, true, false, true, false, true};
+//        GA.mutateGenotype(test);
+
+        GA.generateRecombinant(GA.currentRuleSetPopultion.get(0).rule, GA.currentRuleSetPopultion.get(1).rule);
     }
 }
 
