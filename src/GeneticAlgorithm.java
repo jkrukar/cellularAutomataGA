@@ -337,7 +337,7 @@ public class GeneticAlgorithm {
 
             //For each rule in the rule set population
             for(int j=0; j < 100; j++){
-//                System.out.println("\t\tTesting Rule: " + (j+1) + "/100");
+                System.out.println("\t\tTesting Rule: " + (j+1) + "/100");
 
                 boolean nextRule[] = nextGenerationRuleSet.get(j).rule;     //Get the actual rule to use on the CA
                 boolean nextRuleResults[] = nextGenerationRuleSet.get(j).results;   //Get the results array to store the result of the CA classification
