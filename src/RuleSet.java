@@ -18,13 +18,13 @@ public class RuleSet {
 
         double trueCount = 0;
 
-        for(int i=0; i<8; i++){
+        for(int i=0; i<rule.length; i++){
             if(rule[i]){
                 trueCount++;
             }
         }
 
-        this.lambdaValue = trueCount/8;
+        this.lambdaValue = trueCount/rule.length;
     }
 
     public void calculateFitness(){

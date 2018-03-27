@@ -17,33 +17,29 @@ public class GeneticAlgorithm {
     */
     public void generateInitialRuleSetPopulation(){
 
-        //These rule sets are hard coded in since there's no way to randomly vary their rulset.
-        boolean allFalse[] = {false, false, false, false, false, false, false, false};
-        RuleSet allFalseRuleSet = new RuleSet(allFalse);
+        //Generate rules with less than half digits equal to 1
+        for(int i=0; i<50; i++){
 
-        boolean allTrue[] = {true, true, true, true, true, true, true, true};
-        RuleSet allTrueRuleSet = new RuleSet(allTrue);
+            int initialOnes = random.nextInt(64);
+            boolean[] initialBoolConfig = new boolean[128];
+            mutateGenotype(initialOnes, initialBoolConfig);
 
-        currentRuleSetPopultion.add(allFalseRuleSet);
-        currentRuleSetPopultion.add(allTrueRuleSet);
-
-        //Next lambda refers to the numerator of the next lambda value. Ex: nextLambda = 1 refers to 1/8 true, 7/8 false. Actual lambda value = 0.125
-        for(int nextLambda = 1; nextLambda <= 7; nextLambda ++){
-
-            for(int variantCount = 0; variantCount < 14; variantCount++){
-
-                //Keep track of which indexes have been flipped so that we don't try to flip the same one again
-                boolean nextVariant[] = {false, false, false, false, false, false, false, false};
-
-                mutateGenotype(nextLambda, nextVariant);
-
-                //Add variant to the population
-                RuleSet nextRuleSet = new RuleSet(nextVariant);
-                currentRuleSetPopultion.add(nextRuleSet);
-            }
+            //Add variant to the population
+            RuleSet nextRuleSet = new RuleSet(initialBoolConfig);
+            currentRuleSetPopultion.add(nextRuleSet);
         }
 
-        generationRuleSets.add(currentRuleSetPopultion);
+        //Generate rules with more than half digits equal to 1
+        for(int i=0; i<50; i++){
+
+            int initialOnes = random.nextInt(64) + 64;
+            boolean[] initialBoolConfig = new boolean[128];
+            mutateGenotype(initialOnes, initialBoolConfig);
+
+            //Add variant to the population
+            RuleSet nextRuleSet = new RuleSet(initialBoolConfig);
+            currentRuleSetPopultion.add(nextRuleSet);
+        }
 
         //Prints out the list of rule sets
         if(debug){
@@ -189,12 +185,13 @@ public class GeneticAlgorithm {
 
     public boolean[][] generateRecombinants(boolean[] rule1, boolean[] rule2){
 
-        int crossOverIndex = random.nextInt(6) +1;
+        int ruleLength = rule1.length;
+        int crossOverIndex = random.nextInt(ruleLength-2) +1;
 
-        boolean newRule1[] = new boolean[8];
-        boolean newRule2[] = new boolean[8];
+        boolean newRule1[] = new boolean[ruleLength];
+        boolean newRule2[] = new boolean[ruleLength];
 
-        for(int j=0; j<8;j++){
+        for(int j=0; j < ruleLength; j++){
             if(j<crossOverIndex){
                 newRule1[j] = rule2[j];
                 newRule2[j] = rule1[j];
@@ -210,7 +207,7 @@ public class GeneticAlgorithm {
 
             System.out.print("Rule1 pre: [");
 
-            for(int j=0; j<8;j++){
+            for(int j=0; j<ruleLength;j++){
                 if(rule1[j]){
                     System.out.print("1,");
                 }else{
@@ -220,7 +217,7 @@ public class GeneticAlgorithm {
 
             System.out.print("] post: [");
 
-            for(int j=0; j<8;j++){
+            for(int j=0; j<ruleLength;j++){
                 if(newRule1[j]){
                     System.out.print("1,");
                 }else{
@@ -232,7 +229,7 @@ public class GeneticAlgorithm {
 
             System.out.print("Rule2 pre: [");
 
-            for(int j=0; j<8;j++){
+            for(int j=0; j<ruleLength;j++){
                 if(rule2[j]){
                     System.out.print("1,");
                 }else{
@@ -242,7 +239,7 @@ public class GeneticAlgorithm {
 
             System.out.print("] post: [");
 
-            for(int j=0; j<8;j++){
+            for(int j=0; j<ruleLength;j++){
                 if(newRule2[j]){
                     System.out.print("1,");
                 }else{
@@ -286,7 +283,7 @@ public class GeneticAlgorithm {
             System.out.print("\t\t\t Rule= [");
             int[] eliteRuleInt = convertBoolToInt(nextElite.rule);
 
-            for(int i=0; i< 8; i++){
+            for(int i=0; i< eliteRuleInt.length; i++){
                 System.out.print(eliteRuleInt[i] + ",");
             }
             System.out.print("]\n");
@@ -359,7 +356,6 @@ public class GeneticAlgorithm {
 
                     CA nextCA = new CA(nextRule,nextInitialConfiguration);    //Make a CA with this rule and initial configuration
                     nextRuleResults[k] = nextCA.correctClassification;  //Record the result in the RuleSet
-
                 }
             }
 
@@ -372,34 +368,8 @@ public class GeneticAlgorithm {
         GeneticAlgorithm GA = new GeneticAlgorithm();
         GA.generateInitialRuleSetPopulation();
 
-        ArrayList<int[]> testIC = GA.generateInitialCellConfiguration();
-        boolean testRule[] = {false, false, false, true, false, true, true, true};
-//        System.out.println("testSize = " + test.size());
-
 //        GA.generateInitialCellConfiguration();
 //        GA.runGA();
-
-        CA cell = new CA(testRule,testIC.get(0));
-        System.out.println("GKL Matrix");
-        for(int i=0; i< 600; i++){
-
-            System.out.print("\t");
-
-            for(int j=0; j< 149; j++){
-
-                System.out.print(cell.matrix[i][j] + " ");
-            }
-
-            System.out.print("\n");
-        }
-
-        int ones = 0;
-        for(int k=0; k< 149; k++){
-            if(cell.matrix[0][k] == 1){
-                ones++;
-            }
-        }
-        System.out.println("ones = " + ones);
     }
 
     private class FitnessComparator implements Comparator<RuleSet>{
