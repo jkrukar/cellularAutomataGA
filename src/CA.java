@@ -13,7 +13,8 @@ public class CA  {
 	Random rand = new Random();
 	public boolean correctClassification = false;
 	HashMap<String,Integer> ruleMap = new HashMap(128);
-
+	
+	String KEY = "";
    
 	/*
 	 *  rule set example {0,1,1,0,1,1,0,1} 
@@ -81,24 +82,163 @@ public class CA  {
 	void generate1D()
 	{
 	    // For every spot, determine new state by examing current state, and neighbor states
-
-		for(int j=1; j < MAXTIMESTEPS; j++){
-			for (int i = 0; i < CELLPOPULATIONSIZE; i++) {
-
-				int leftIndex = i-1;   // Left neighbor state
-				int rightIndex = i+1;  // Right neighbor state
-
-				if(leftIndex < 0){
-					leftIndex = CELLPOPULATIONSIZE-1;   // Left neighbor state
+        String key = " ";
+		for(int j=1; j < MAXTIMESTEPS; j++)
+		{
+			for (int i = 0; i < CELLPOPULATIONSIZE; i++) 
+			{
+				int leftIndex1 = i - 1;
+				int leftIndex2  = i - 2;
+				int leftIndex3 = i - 3;
+				
+				int rightIndex1 = i + 1;
+				int rightIndex2  = i + 2;
+				int rightIndex3 = i + 3;
+				
+				
+				if(leftIndex1 < 0)
+				{
+					leftIndex1 = CELLPOPULATIONSIZE-1;   // Left neighbor state
+				}
+				
+				if(leftIndex2 < 0)
+				{
+					leftIndex2 = CELLPOPULATIONSIZE-2; 
+				}
+				
+				if(leftIndex3 < 0)
+				{
+					leftIndex3 = CELLPOPULATIONSIZE-3; 
 				}
 
-				if(rightIndex >= CELLPOPULATIONSIZE){
-					rightIndex = 0;  // Right neighbor state
-				}
 
-				matrix[j][i] = rules(matrix[j-1][leftIndex], matrix[j-1][i], matrix[j-1][rightIndex]); // Compute next generation state based on ruleset
+				if(rightIndex1 >= CELLPOPULATIONSIZE)
+				{
+					rightIndex1 = 0;  // Right neighbor state
+				}
+				
+				if(rightIndex1 >= CELLPOPULATIONSIZE)
+				{
+					rightIndex2 = 0;  // Right neighbor state
+				}
+				
+				if(rightIndex1 >= CELLPOPULATIONSIZE)
+				{
+					rightIndex3 = 0;  // Right neighbor state
+				}
+				String left1 = String.valueOf(matrix[j-1][leftIndex1]);
+				String left2 = String.valueOf(matrix[j-1][leftIndex2]);
+				String left3 = String.valueOf(matrix[j-1][leftIndex3]);
+				
+				String middle = String.valueOf(matrix[j-1][i]);
+				
+				String right1 = String.valueOf(matrix[j-1][rightIndex1]);
+				String right2 = String.valueOf(matrix[j-1][rightIndex2]);
+				String right3 = String.valueOf(matrix[j-1][rightIndex3]);
+				
+				key = left1 + left2 + left3 + middle + right1 + right2 + right3;
+				
+				rules(key);
+				
 			}
 		}
+	}
+	/**** BROKEN FOR NOW :( *********/
+	/*** Code also assumes radius is indeed 3 **/
+	
+	 /** Build the string from left to right **/
+	  /** For example assuming i == 4 : **/
+	  /*** cell1 cell2 cell3 cell4 cell5 cell6 cell7 
+	   * 
+	   *   left index1 = 4 - 3 = cell1
+	   *   middle index1 = 4 - 2 = cell2
+	   *   right index1 =  4 - 1 = cell3
+	   *   
+	   *   middleIndex = cell4(i)
+	   *
+	   *   leftIndex2 = 4 + 3 = cell7
+	   *   middleIndex2 = 4 + 2 = cells6
+	   *   rightIndex2 = 4 + 1  = cells5
+	   */
+	void generate1D(int radius)
+	{
+	    String key = "";
+		for(int j=1; j < MAXTIMESTEPS; j++)
+		{
+			for (int i = 0; i < CELLPOPULATIONSIZE; i++) 
+			{
+				
+			   int leftIndex1 = i - radius;
+			   int middleIndex1 = i - (radius - 1);
+			   int rightIndex1 =  i - (radius - 2);
+			   
+			   int middle = i;
+			   
+			   
+			   int leftIndex2 = i + radius;
+			   int middleIndex2 = i + (radius - 1);
+			   int rightIndex2 =  i + (radius - 2);
+			   
+			   /**
+			    * Example if i == 1 and Cell Population Size is 8
+			    * leftIndex1 =  8 - ( 1 - 3) = 4 
+			    */
+			   if(leftIndex1 < 0)
+				{
+					leftIndex1 = CELLPOPULATIONSIZE-leftIndex1;  
+				}
+			   
+			   if(middleIndex1 < 0)
+				{
+					middleIndex1 = CELLPOPULATIONSIZE-middleIndex1;   
+				}
+			   
+			   
+			   if(rightIndex1 < 0)
+				{
+					rightIndex1 = CELLPOPULATIONSIZE - rightIndex1 ;  
+				}
+				
+			   /*** 
+			    * Example if i == 8 and 8 is the CELLPOPULATIONSIZE
+			    *   leftIndex2 = 0 + (3) = 3 
+			    */
+				if(leftIndex2 >= CELLPOPULATIONSIZE)
+				{
+					leftIndex2 = 0 + leftIndex2; 
+				}
+				
+				if(middleIndex2 >= CELLPOPULATIONSIZE)
+				{
+					middleIndex2 = 0 + middleIndex2; 
+				}
+				
+				
+				if(rightIndex2 >= CELLPOPULATIONSIZE)
+				{
+					rightIndex1 = 0 + rightIndex2 ;  // Right neighbor state
+				}
+				
+				
+			   
+			   String leftNeighbor1 = String.valueOf(matrix[j-1][leftIndex1]);
+			   String middleNeighbor1 = String.valueOf(matrix[j-1][middleIndex1]);
+			   String rightNeighbor1 = String.valueOf(matrix[j-1][rightIndex1]);
+			   
+			   String mid = String.valueOf(matrix[j-1][i]);
+			   
+			   
+			   String leftNeighbor2 = String.valueOf(matrix[j-1][leftIndex2]);
+			   String middleNeighbor2 = String.valueOf(matrix[j-1][middleIndex2]);
+			   String rightNeighbor2 = String.valueOf(matrix[j-1][rightIndex2]);
+				  
+			   key = leftNeighbor1 + middleNeighbor1 + mid + leftNeighbor2 + middleNeighbor2 + rightNeighbor2;
+			   rules(key);
+			 
+			}
+			
+		}
+		
 	}
 
 	boolean determineCorrectClassification(){
