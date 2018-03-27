@@ -5,7 +5,7 @@ public class GeneticAlgorithm {
 
     public final int CELLPOPULATIONSIZE = 149;
     Random random = new Random();
-    ArrayList<RuleSet> currentRuleSetPopultion = new ArrayList<>(CELLPOPULATIONSIZE);
+    ArrayList<RuleSet> currentRuleSetPopulation = new ArrayList<>(CELLPOPULATIONSIZE);
     ArrayList<ArrayList<RuleSet>> generationRuleSets = new ArrayList<>(320);
     ArrayList<int[]> initialConfigurationSet;
     boolean debug = false;
@@ -26,7 +26,7 @@ public class GeneticAlgorithm {
 
             //Add variant to the population
             RuleSet nextRuleSet = new RuleSet(initialBoolConfig);
-            currentRuleSetPopultion.add(nextRuleSet);
+            currentRuleSetPopulation.add(nextRuleSet);
         }
 
         //Generate rules with more than half digits equal to 1
@@ -38,12 +38,14 @@ public class GeneticAlgorithm {
 
             //Add variant to the population
             RuleSet nextRuleSet = new RuleSet(initialBoolConfig);
-            currentRuleSetPopultion.add(nextRuleSet);
+            currentRuleSetPopulation.add(nextRuleSet);
         }
+
+        generationRuleSets.add(currentRuleSetPopulation);
 
         //Prints out the list of rule sets
         if(debug){
-            printRuleSetPopulation(currentRuleSetPopultion);
+            printRuleSetPopulation(currentRuleSetPopulation);
         }
     }
 
@@ -368,8 +370,8 @@ public class GeneticAlgorithm {
         GeneticAlgorithm GA = new GeneticAlgorithm();
         GA.generateInitialRuleSetPopulation();
 
-//        GA.generateInitialCellConfiguration();
-//        GA.runGA();
+        GA.generateInitialCellConfiguration();
+        GA.runGA();
     }
 
     private class FitnessComparator implements Comparator<RuleSet>{
