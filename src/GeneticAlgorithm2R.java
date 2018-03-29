@@ -1,7 +1,9 @@
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.Random;
 
-import java.util.*;
-
-public class GeneticAlgorithm {
+public class GeneticAlgorithm2R {
 
     public final int CELLPOPULATIONSIZE = 149;
     Random random = new Random();
@@ -20,8 +22,8 @@ public class GeneticAlgorithm {
         //Generate rules with less than half digits equal to 1
         for(int i=0; i<50; i++){
 
-            int initialOnes = random.nextInt(64);
-            boolean[] initialBoolConfig = new boolean[128];
+            int initialOnes = random.nextInt(16);
+            boolean[] initialBoolConfig = new boolean[32];
             mutateGenotype(initialOnes, initialBoolConfig);
 
             //Add variant to the population
@@ -32,8 +34,8 @@ public class GeneticAlgorithm {
         //Generate rules with more than half digits equal to 1
         for(int i=0; i<50; i++){
 
-            int initialOnes = random.nextInt(64) + 64;
-            boolean[] initialBoolConfig = new boolean[128];
+            int initialOnes = random.nextInt(16) + 16;
+            boolean[] initialBoolConfig = new boolean[32];
             mutateGenotype(initialOnes, initialBoolConfig);
 
             //Add variant to the population
@@ -70,21 +72,6 @@ public class GeneticAlgorithm {
             mutateGenotype(initialBlackCells, initialBoolConfig);
             newConfigurationSet.add(convertBoolToInt(initialBoolConfig));
         }
-
-
-//        for(int j=0; j<newConfigurationSet.size(); j++){
-//
-//            System.err.println("TEST!!!!!!!!!!!! : " + newConfigurationSet.size());
-//
-//            int nextInitialConfiguration[] = newConfigurationSet.get(j);
-//
-//            for(int l=0; l< nextInitialConfiguration.length; l++){
-//                System.err.print(nextInitialConfiguration[l]);
-//            }
-//
-//            System.err.println("\n");
-//        }
-
 
         return newConfigurationSet;
     }
@@ -281,19 +268,14 @@ public class GeneticAlgorithm {
         while(eliteCount < 20){
 
             RuleSet nextElite = eliteRules.poll();
-//            System.out.println("\t\tElite:  fitness = " + nextElite.fitness + ", lambda = " + nextElite.lambdaValue);
-//            System.out.print("\t\t\t Rule= [");
+            System.out.println("\t\tElite:  fitness = " + nextElite.fitness + ", lambda = " + nextElite.lambdaValue);
+            System.out.print("\t\t\t Rule= [");
+            int[] eliteRuleInt = convertBoolToInt(nextElite.rule);
 
-            if(eliteCount == 0){
-                System.out.print("" + nextElite.fitness + "," + nextElite.lambdaValue + ",");
-
-                int[] eliteRuleInt = convertBoolToInt(nextElite.rule);
-
-                for(int i=0; i< eliteRuleInt.length; i++){
-                    System.out.print(eliteRuleInt[i]);
-                }
-                System.out.print("\n");
+            for(int i=0; i< eliteRuleInt.length; i++){
+                System.out.print(eliteRuleInt[i] + ",");
             }
+            System.out.print("]\n");
 
             nextRuleSetGeneration.add(new RuleSet(nextElite.rule));
             eliteCount ++;
@@ -331,20 +313,18 @@ public class GeneticAlgorithm {
 
     public void runGA(){
 
-//        System.out.println("runGA()...");
+        System.out.println("runGA()...");
 
         //For each generation of rule sets
         for(int i=0; i < 100; i++){ //99 generations + initial generation = 100
 //        for(int i=0; i < 1; i++){ //99 generations + initial generation = 100
-//            System.out.println("\tCurrent Generation: " + (i+1) + "/100");
+            System.out.println("\tCurrent Generation: " + (i+1) + "/100");
 
             ArrayList<RuleSet> nextGenerationRuleSet = generationRuleSets.get(i);
 
-            System.out.print(i+ ",");
-
             //For each rule in the rule set population
             for(int j=0; j < 100; j++){
-//                System.out.println("\t\tTesting Rule: " + (j+1) + "/100");
+                System.out.println("\t\tTesting Rule: " + (j+1) + "/100");
 
                 boolean nextRule[] = nextGenerationRuleSet.get(j).rule;     //Get the actual rule to use on the CA
                 boolean nextRuleResults[] = nextGenerationRuleSet.get(j).results;   //Get the results array to store the result of the CA classification
@@ -363,7 +343,7 @@ public class GeneticAlgorithm {
 //                    }
 //                    System.err.print("\n");
 
-                    CA nextCA = new CA(nextRule,nextInitialConfiguration);    //Make a CA with this rule and initial configuration
+                    CA2R nextCA = new CA2R(nextRule,nextInitialConfiguration);    //Make a CA with this rule and initial configuration
                     nextRuleResults[k] = nextCA.correctClassification;  //Record the result in the RuleSet
                 }
             }
@@ -374,30 +354,11 @@ public class GeneticAlgorithm {
     }
 
     public static void main(String[] args){
-        GeneticAlgorithm GA = new GeneticAlgorithm();
+        GeneticAlgorithm2R GA = new GeneticAlgorithm2R();
         GA.generateInitialRuleSetPopulation();
+
         GA.generateInitialCellConfiguration();
         GA.runGA();
-
-        GeneticAlgorithm GA2 = new GeneticAlgorithm();
-        GA2.generateInitialRuleSetPopulation();
-        GA2.generateInitialCellConfiguration();
-        GA2.runGA();
-
-        GeneticAlgorithm GA3 = new GeneticAlgorithm();
-        GA3.generateInitialRuleSetPopulation();
-        GA3.generateInitialCellConfiguration();
-        GA3.runGA();
-
-        GeneticAlgorithm GA4 = new GeneticAlgorithm();
-        GA4.generateInitialRuleSetPopulation();
-        GA4.generateInitialCellConfiguration();
-        GA4.runGA();
-
-        GeneticAlgorithm GA5 = new GeneticAlgorithm();
-        GA5.generateInitialRuleSetPopulation();
-        GA5.generateInitialCellConfiguration();
-        GA5.runGA();
     }
 
     private class FitnessComparator implements Comparator<RuleSet>{
