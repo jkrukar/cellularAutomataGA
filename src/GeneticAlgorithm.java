@@ -3,6 +3,8 @@ import java.util.*;
 
 public class GeneticAlgorithm {
 
+    public final boolean LAMDACONSTRAINTEXISTS = true;
+    public final double LAMBDACONSTRAINT = 0.45;
     public final int CELLPOPULATIONSIZE = 149;
     Random random = new Random();
     ArrayList<RuleSet> currentRuleSetPopulation = new ArrayList<>(CELLPOPULATIONSIZE);
@@ -265,8 +267,20 @@ public class GeneticAlgorithm {
         //Calculate fitness for every member of population and add it to priority queue
         for(int i=0; i< populationSize;i++){
             RuleSet nextRuleSet = population.get(i);
-            nextRuleSet.calculateFitness();
-            priorityRuleSet.add(nextRuleSet);
+
+            if(LAMDACONSTRAINTEXISTS){
+
+                double nextLambda = nextRuleSet.lambdaValue;
+
+                if(nextLambda < LAMBDACONSTRAINT){
+                    nextRuleSet.calculateFitness();
+                    priorityRuleSet.add(nextRuleSet);
+                }
+
+            }else{
+                nextRuleSet.calculateFitness();
+                priorityRuleSet.add(nextRuleSet);
+            }
         }
 
         return priorityRuleSet;
@@ -284,7 +298,8 @@ public class GeneticAlgorithm {
 //            System.out.println("\t\tElite:  fitness = " + nextElite.fitness + ", lambda = " + nextElite.lambdaValue);
 //            System.out.print("\t\t\t Rule= [");
 
-            if(eliteCount == 0){
+//            if(eliteCount == 0){
+            if(true){
                 System.out.print("" + nextElite.fitness + "," + nextElite.lambdaValue + ",");
 
                 int[] eliteRuleInt = convertBoolToInt(nextElite.rule);

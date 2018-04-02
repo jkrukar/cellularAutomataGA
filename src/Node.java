@@ -1,12 +1,13 @@
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 
 public class Node {
 
-    final double FITNESSLOWERDEVIATIONBOUND = 0.95;
-    final double FITNESSUPPERDEVIATIONBOUND = 1.05;
-    final int MAXROOTDISTANCE = 10;
+    final double FITNESSLOWERDEVIATIONBOUND = 0.04;
+    final double FITNESSUPPERDEVIATIONBOUND = 0.04;
+    final int MAXROOTDISTANCE = 3;
     final int CELLPOPULATIONSIZE = 149;
     final int FITNESSTESTS = 100; //Indicates how many initial configurations this rule will be tested on to evaluate fitness
     int rule[];
@@ -20,31 +21,70 @@ public class Node {
     HashSet<String> ruleSet;
     ArrayList<Node> neighbors;
     ArrayList<Node> leaves;
-
+    boolean protectedGenes[];
+    NeutralNetwork network;
 
     int rootDistance; //The distance of this node from the root
     Node progeny[]; //??????????? Need a way to keep track of edges
 
-    public Node(int[] rule, int rootDistance, double fitnessMin, double fitnessMax, HashSet<String> ruleSet, ArrayList<Node> leaves){
+    public Node(int[] rule, int rootDistance, double fitnessMin, double fitnessMax, HashSet<String> ruleSet, boolean[] protectedGenes, ArrayList<Node> leaves, NeutralNetwork parent){
         //TODO probably need progeny or something
         this.rule = rule;
         this.rootDistance = rootDistance;
+        network = parent;
         this.lambda = calculateLambda();
         this.fitness = calculateFitness();
 //        System.out.println("fitness = " + fitness + ", rootDistance= " + rootDistance);
         this.fitnessMin = fitnessMin;
         this.fitnessMax = fitnessMax;
         this.ruleSet = ruleSet;
+        this.protectedGenes = protectedGenes;
         this.leaves = leaves;
         this.leaf = isLeaf();
 //        System.out.println("ruleSet size = " + ruleSet.size());
 
-        //TODO: ifleaf...
-        if(!leaf && rootDistance <= MAXROOTDISTANCE){
-            System.out.println(rootDistance + "," + fitness + "," + lambda + "," + ruleToString(rule) + "," + fitnessMin + "," + fitnessMax);
-            neighbors = findAdjacentGenotypes();
-        }else{
-            leaves.add(this);
+//        if(rootDistance > network.globalMaxDistance){
+//            network.globalMaxDistance = rootDistance;
+//            System.out.println("globalMaxDepth = " + network.globalMaxDistance);
+//
+//            LocalDateTime ldt = LocalDateTime.now();
+//            System.out.println("\t" + ldt);
+//        }
+
+        if(!network.FOUNDTARGETPHENOTYPE){
+
+            if(!leaf && rootDistance <= MAXROOTDISTANCE){
+//                System.out.print(rootDistance + "," + fitness + "," + lambda + "," + fitnessMin + "," + fitnessMax + ",");
+//
+//                for(int i=0; i< rule.length; i++){
+//                    System.out.print(rule[i] + ",");
+//                }
+//                System.out.print("false");
+//                System.out.print("\n");
+                neighbors = findAdjacentGenotypes();
+            }else{
+//                System.out.print(rootDistance + "," + fitness + "," + lambda + "," + fitnessMin + "," + fitnessMax + ",");
+//
+//                for(int i=0; i< rule.length; i++){
+//                    System.out.print(rule[i] + ",");
+//                }
+//                System.out.print("true");
+//                System.out.print("\n");
+                leaves.add(this);
+
+                if(this.fitness >= network.TARGETPHENOTYPE){
+//                    System.out.println("Found target phenotype! fitness = " + this.fitness);
+                    System.out.print(rootDistance + "," + fitness + "," + lambda + "," + fitnessMin + "," + fitnessMax + ",");
+
+                    for(int i=0; i< rule.length; i++){
+                        System.out.print(rule[i] + ",");
+                    }
+//                    System.out.print("true");
+//                    System.out.print("\n");
+
+                    network.FOUNDTARGETPHENOTYPE = true;
+                }
+            }
         }
     }
 
@@ -67,7 +107,8 @@ public class Node {
 
         for(int i=0; i < nextConfigurationSet.size(); i++){
 
-            CA2R nextCA = new CA2R(rule,nextConfigurationSet.get(i));
+//            CA2R nextCA = new CA2R(rule,nextConfigurationSet.get(i));
+            inverseCA2R nextCA = new inverseCA2R(rule,nextConfigurationSet.get(i));
             fitnessResults[i] = nextCA.correctClassification;
         }
 
@@ -159,7 +200,7 @@ public class Node {
 
             for(int j=0; j < rule.length; j++){
 
-                if(j==i){
+                if(j==i && !protectedGenes[j]){
                     if(rule[j] == 1){
                         nextGenotype = nextGenotype + "0";
                         nextRule[j] = 0;
@@ -167,6 +208,7 @@ public class Node {
                         nextGenotype = nextGenotype + "1";
                         nextRule[j] = 1;
                     }
+
                 }else{
                     nextGenotype = nextGenotype + rule[j];
                     nextRule[j] = rule[j];
@@ -178,10 +220,28 @@ public class Node {
 
                 Node nextNode;
 
+                boolean nextProtectedGenes[] = new boolean[rule.length];
+
+                for(int k=0; k < rule.length; k++){
+                    if(i==k){
+                        nextProtectedGenes[k] = true;
+                    }else{
+                        nextProtectedGenes[k] = protectedGenes[k];
+                    }
+                }
+
+//                System.out.println("NextProtectedGenes:");
+//                System.out.print("\t");
+//                for(int m=0; m< rule.length; m++){
+//                    System.out.print(nextProtectedGenes[m] + ",");
+//                }
+//                System.out.print("\n");
+
                 if(rootDistance == 0){
-                    nextNode = new Node(nextRule, rootDistance+1,fitness*FITNESSLOWERDEVIATIONBOUND,fitness*FITNESSUPPERDEVIATIONBOUND,ruleSet, leaves);
+//                    System.out.println("root fitness= " + fitness);
+                    nextNode = new Node(nextRule, rootDistance+1,fitness-FITNESSLOWERDEVIATIONBOUND,fitness+FITNESSUPPERDEVIATIONBOUND,ruleSet,nextProtectedGenes, leaves, network);
                 }else{
-                    nextNode = new Node(nextRule, rootDistance+1,fitnessMin,fitnessMax,ruleSet, leaves);
+                    nextNode = new Node(nextRule, rootDistance+1,fitnessMin,fitnessMax,ruleSet,nextProtectedGenes, leaves, network);
                 }
                 mutants.add(nextNode);
             }

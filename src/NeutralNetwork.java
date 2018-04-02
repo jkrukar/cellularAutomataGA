@@ -4,22 +4,20 @@ import java.util.HashSet;
 public class NeutralNetwork {
 
     final boolean DEBUG = false;
-//    final int MAXDEPTH;
-//    final double FITNESSMIN;
-//    final double FITNESSMAX;
     HashSet<String> ruleSet = new HashSet<>(); //Keeps track of all the unique rules in the network so that duplicates are not added
     ArrayList<Node> network = new ArrayList<>();
     ArrayList<Node> leaves = new ArrayList<>();
     Node root;
+//    public int globalMaxDistance = 0;
+    public boolean FOUNDTARGETPHENOTYPE = false;
+    public double TARGETPHENOTYPE = 0.5; //Want a phenotype with a fitness less than or equal to this value
 
-    public NeutralNetwork(int[] rule, int maxDepth){
-//        MAXDEPTH = maxDepth;
+    public NeutralNetwork(int[] rule){
         ruleSet.add(ruleToString(rule));
-        root = new Node(rule,0,0,1, ruleSet, leaves);
-//        FITNESSMAX = root.fitness * 1.01; //1% higher than root fitness
-//        FITNESSMIN = root.fitness * 0.99; //1% lower than root fitness
+        boolean protectedGenes[] = new boolean[rule.length];
+        root = new Node(rule,0,0,1, ruleSet, protectedGenes, leaves, this);
 
-        System.out.println("root= " + root.rootDistance + "," + root.fitness + "," + root.lambda + "," + ruleToString(rule));
+        System.out.print(",root," + root.rootDistance + "," + root.fitness + "," + root.lambda + "," + ruleToString(rule));
 
         network.add(root);
     }
@@ -40,40 +38,36 @@ public class NeutralNetwork {
         return ruleString;
     }
 
-
-    //Take a rule
-
-    //Mutate it every possible way to get all rules 1 mutation away
-
-    //Check the fitness of mutant rules - remove those not in the fitness bin
-
-    //Mutate mutants recursively
-
-    //I want data output to look like:
-        // 00000->00001-10001
-        //        00001-00011
-
-    //When a leaf is discovered, keep track of the new phenotype discovered
-
-    //Could fitness function be that lambda must be less than 0.5?
-
-    //Has evolution come up with neutral network as a buffer against unfair/arbitrary environmental changes
-
-    //TODO Make sure that the new mutated node does not already exist in the network!! Otherwise DFS might never terminate!
-
     public static void main(String[] args){
 
-        int rule[] = {0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,1,1,1,1,0,1,1,1,1,1,1,0,1,1,1};
-        int depth = 1;
+        int rule1[] = {1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1}; //0.51 fitness?
+        int rule2[] = {0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,1,1,1,1,0,1,1,1,1,1,1,0,1,1,1}; //0.55 fitness?
+        int rule3[] = {0,0,0,0,0,0,1,1,0,1,1,1,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,1,1,1}; //0.57 fitness?
+        int rule4[] = {0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,1,1,0,1,1,0,1,1,1,1,1,1,1}; //0.61 fitness?
+        int rule5[] = {0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,1,0,1,1,0,1,1,0,1,1,1,0,1,1,1}; //0.64 fitness?
+        int rule6[] = {0,0,0,0,0,0,1,1,0,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,1,0,1,1,1}; //0.71 fitness?
+        int rule7[] = {0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,1,0,1,1,1,0,1,1,1,0,1,1,1}; //0.73 fitness?
+        int rule8[] = {0,0,0,0,0,0,1,1,0,1,1,1,0,0,1,1,0,1,0,1,1,1,1,1,0,1,1,1,0,1,1,1}; //0.75 fitness?
+        int rule9[] = {0,0,0,1,0,0,0,0,0,0,1,1,0,1,0,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1}; //0.8 fitness
+        int rule10[] = {0,0,0,0,0,0,1,1,0,0,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1}; //0.9 fitness
 
-        NeutralNetwork neutralNetwork = new NeutralNetwork(rule, depth);
+        int[] testRules[] = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10};
 
-        System.out.println("Leaves");
 
-        for(int i=0; i<neutralNetwork.leaves.size(); i++){
-            Node nextLeaf = neutralNetwork.leaves.get(i);
-            System.out.println(nextLeaf.rootDistance + "," + nextLeaf.fitness + "," + nextLeaf.lambda + "," + nextLeaf.ruleToString(nextLeaf.rule));
+        for(int i=9; i>=5; i-- ){
+            for(int j=0; j<20; j++){
+                System.out.print(i +",");
+                NeutralNetwork neutralNetwork = new NeutralNetwork(testRules[i]);
+                System.out.print("\n");
+            }
         }
+
+//        System.out.println("Leaves");
+//
+//        for(int i=0; i<neutralNetwork.leaves.size(); i++){
+//            Node nextLeaf = neutralNetwork.leaves.get(i);
+//            System.out.println(nextLeaf.rootDistance + "," + nextLeaf.fitness + "," + nextLeaf.lambda + "," + nextLeaf.ruleToString(nextLeaf.rule));
+//        }
 
     }
 }
