@@ -54,12 +54,18 @@ public class NeutralNetwork {
         int[] testRules[] = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10};
 
 
-        for(int i=9; i>=5; i-- ){
+//        for(int i=9; i>=5; i-- ){
             for(int j=0; j<20; j++){
-                System.out.print(i +",");
-                NeutralNetwork neutralNetwork = new NeutralNetwork(testRules[i]);
+                System.out.print(6 +",");
+                NeutralNetwork neutralNetwork = new NeutralNetwork(testRules[6]);
                 System.out.print("\n");
             }
+//        }
+
+        for(int j=0; j<20; j++){
+            System.out.print(9 +",");
+            NeutralNetwork neutralNetwork2 = new NeutralNetwork(testRules[9]);
+            System.out.print("\n");
         }
 
 //        System.out.println("Leaves");

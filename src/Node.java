@@ -7,7 +7,7 @@ public class Node {
 
     final double FITNESSLOWERDEVIATIONBOUND = 0.04;
     final double FITNESSUPPERDEVIATIONBOUND = 0.04;
-    final int MAXROOTDISTANCE = 3;
+    final int MAXROOTDISTANCE = 0;
     final int CELLPOPULATIONSIZE = 149;
     final int FITNESSTESTS = 100; //Indicates how many initial configurations this rule will be tested on to evaluate fitness
     int rule[];
@@ -107,8 +107,8 @@ public class Node {
 
         for(int i=0; i < nextConfigurationSet.size(); i++){
 
-//            CA2R nextCA = new CA2R(rule,nextConfigurationSet.get(i));
-            inverseCA2R nextCA = new inverseCA2R(rule,nextConfigurationSet.get(i));
+            CA2R nextCA = new CA2R(rule,nextConfigurationSet.get(i));
+//            inverseCA2R nextCA = new inverseCA2R(rule,nextConfigurationSet.get(i));
             fitnessResults[i] = nextCA.correctClassification;
         }
 
