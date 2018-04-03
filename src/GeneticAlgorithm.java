@@ -3,7 +3,7 @@ import java.util.*;
 
 public class GeneticAlgorithm {
 
-    public final boolean LAMDACONSTRAINTEXISTS = true;
+    public final boolean LAMDACONSTRAINTEXISTS = false;
     public final double LAMBDACONSTRAINT = 0.45;
     public final int CELLPOPULATIONSIZE = 149;
     Random random = new Random();
@@ -72,20 +72,6 @@ public class GeneticAlgorithm {
             mutateGenotype(initialBlackCells, initialBoolConfig);
             newConfigurationSet.add(convertBoolToInt(initialBoolConfig));
         }
-
-
-//        for(int j=0; j<newConfigurationSet.size(); j++){
-//
-//            System.err.println("TEST!!!!!!!!!!!! : " + newConfigurationSet.size());
-//
-//            int nextInitialConfiguration[] = newConfigurationSet.get(j);
-//
-//            for(int l=0; l< nextInitialConfiguration.length; l++){
-//                System.err.print(nextInitialConfiguration[l]);
-//            }
-//
-//            System.err.println("\n");
-//        }
 
 
         return newConfigurationSet;
@@ -298,8 +284,8 @@ public class GeneticAlgorithm {
 //            System.out.println("\t\tElite:  fitness = " + nextElite.fitness + ", lambda = " + nextElite.lambdaValue);
 //            System.out.print("\t\t\t Rule= [");
 
-//            if(eliteCount == 0){
-            if(true){
+            if(eliteCount == 0){
+//            if(true){
                 System.out.print("" + nextElite.fitness + "," + nextElite.lambdaValue + ",");
 
                 int[] eliteRuleInt = convertBoolToInt(nextElite.rule);
@@ -349,7 +335,7 @@ public class GeneticAlgorithm {
 //        System.out.println("runGA()...");
 
         //For each generation of rule sets
-        for(int i=0; i < 100; i++){ //99 generations + initial generation = 100
+        for(int i=0; i < 25; i++){ //99 generations + initial generation = 100
 //        for(int i=0; i < 1; i++){ //99 generations + initial generation = 100
 //            System.out.println("\tCurrent Generation: " + (i+1) + "/100");
 
